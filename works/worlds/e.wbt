@@ -1,0 +1,281 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/gctronic/e-puck/protos/E-puck.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation 0.05079917904443224 -0.9692329220590167 -0.24084639545849984 5.854581524901804
+  position -8.219598613907438 0.16153888469087613 4.576487430543692
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 4 4
+  floorAppearance PBRAppearance {
+    roughness 1
+    metalness 0
+  }
+}
+Robot {
+  translation -0.98 -1.49 0
+  children [
+    Emitter {
+      range 0.05
+      channel 1
+    }
+  ]
+  name "station_B"
+  controller "station_controller"
+}
+Robot {
+  translation -0.95 -0.98 0
+  children [
+    Emitter {
+      range 0.05
+      channel 1
+    }
+  ]
+  name "station_e"
+  controller "station_controller"
+}
+Robot {
+  translation -0.65 -0.98 0
+  children [
+    Emitter {
+      range 0.05
+      channel 1
+    }
+  ]
+  name "station_C"
+  controller "station_controller"
+}
+Robot {
+  translation -0.97 -0.22 0
+  children [
+    Emitter {
+      range 0.05
+      channel 1
+    }
+  ]
+  name "station_f"
+  controller "station_controller"
+}
+Robot {
+  translation -0.67 -0.22 0
+  children [
+    Emitter {
+      range 0.05
+      channel 1
+    }
+  ]
+  name "station_D"
+  controller "station_controller"
+}
+Robot {
+  translation 0.98 -1.5 0
+  children [
+    Emitter {
+      range 0.05
+      channel 1
+    }
+  ]
+  name "station_A"
+  controller "station_controller"
+}
+Solid {
+  translation 0.975 0.001 0
+  rotation 1 0 0 1.5708
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 0
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.05 0.002 3
+      }
+    }
+  ]
+  name "line_right"
+}
+Solid {
+  translation -0.975 0.001 0
+  rotation 1 0 0 1.5708
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 0
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.05 0.002 3
+      }
+    }
+  ]
+  name "line_left"
+}
+Solid {
+  translation 0 1.48 0
+  rotation 1 0 0 0
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 0
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 2 0.05 0.002
+      }
+    }
+  ]
+  name "line_top"
+}
+Solid {
+  translation -0.801 -0.97899 0
+  rotation 1 0 0 0
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 0
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.3 0.05 0.002
+      }
+    }
+  ]
+  name "line_bottom"
+}
+Solid {
+  translation -0.801 -0.21899 0
+  rotation 1 0 0 0
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 0
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.3 0.05 0.002
+      }
+    }
+  ]
+  name "line_bottom(1)"
+}
+Solid {
+  translation -0.471 -0.21899 0.15
+  rotation 1 0 0 0
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0.666667 0
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.3 0.3 0.3
+      }
+    }
+  ]
+  name "POINT_D"
+}
+Solid {
+  translation -0.471 -0.96899 0.14
+  rotation 1 0 0 0
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0.333333 1
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.3 0.3 0.3
+      }
+    }
+  ]
+  name "POINT_C"
+}
+Solid {
+  translation -0.981 -1.65899 0.15
+  rotation 1 0 0 0
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.3 0.3 0.3
+      }
+    }
+  ]
+  name "POINT_B"
+}
+Solid {
+  translation 0.979 -1.65899 0.15
+  rotation 1 0 0 0
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.333333 1 1
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.3 0.3 0.3
+      }
+    }
+  ]
+  name "POINT_A"
+}
+E-puck {
+  hidden position_0_0 56325.94388785497
+  hidden position_0_1 56277.62528031677
+  hidden linearVelocity_0 0.0015732447059165916 0.07981727294342164 4.932125150105624e-06
+  hidden angularVelocity_0 0.01113259701339544 -0.0001393057981971014 6.339227565081697e-07
+  hidden rotation_1 0 1 0 5.765861545150134
+  hidden linearVelocity_1 0.0015748147990965803 0.07976179574355799 -1.5878322568877556e-07
+  hidden angularVelocity_1 -3.988093011254657 0.07856612690505736 1.995766560656177e-05
+  hidden rotation_2 0 -1 0 1.723896481835028
+  hidden linearVelocity_2 0.0015706022827836753 0.07976186971705143 -1.482701593970332e-07
+  hidden angularVelocity_2 -3.9880902797189433 0.07870472731391277 -5.227784240549736e-05
+  translation 0.9726071892280735 -1.2207472756741458 -6.448650893585602e-05
+  rotation 0.0004383344426042903 -0.0004549449531817274 0.9999998004439831 1.5510990546308439
+  controller "my_controller_line_folower"
+  controllerArgs [
+    ""
+  ]
+  groundSensorsSlot [
+    DistanceSensor {
+      translation 0 0 0.02
+      rotation 0 1 0 1.5708
+      name "center_ir"
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation 0 -0.02 0.02
+      rotation 0 1 0 1.5708
+      name "right_ir"
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation 0 0.02 0.02
+      rotation 0 1 0 1.5708
+      name "left_ir"
+      type "infra-red"
+    }
+  ]
+}

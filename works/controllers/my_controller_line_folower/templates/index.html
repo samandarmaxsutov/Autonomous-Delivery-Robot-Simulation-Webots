@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Delivery Robot Control Panel</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f0f2f5; color:#1a1a1a; min-height:100vh; }
+
+    .wrap { max-width:720px; margin:0 auto; padding:2rem 1rem; }
+
+    h1 { font-size:1.5rem; font-weight:800; color: #2d3436; margin-bottom:0.25rem; }
+    .sub { font-size:0.9rem; color:#636e72; margin-bottom:1.5rem; }
+
+    /* Xarita konteyneri va tugmasi */
+    .map-section { margin-bottom: 1.5rem; }
+    .toggle-btn {
+      background: #dfe6e9; border: none; padding: 0.5rem 1rem; border-radius: 8px;
+      cursor: pointer; font-size: 0.8rem; font-weight: 600; color: #2d3436;
+      transition: background 0.2s; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 5px;
+    }
+    .toggle-btn:hover { background: #b2bec3; }
+    .map-content {
+      overflow: hidden; transition: max-height 0.3s ease-out;
+      background: #fff; border-radius: 12px; border: 1px solid #e0e0e0;
+    }
+    .map-content.hidden { max-height: 0; border: none; }
+    .map-content img { width: 100%; display: block; border-radius: 12px; }
+
+    /* Robot Animatsiyasi Trayektoriya */
+    .sim-area {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 12px;
+      padding: 2rem 1.5rem; margin-bottom: 1.5rem; position: relative;
+    }
+    .track {
+      height: 4px; background: #2d3436; width: 100%; border-radius: 2px;
+      position: relative; margin: 2rem 0;
+    }
+    .point {
+      position: absolute; top: -10px; width: 24px; height: 24px;
+      background: #fff; border: 3px solid #2d3436; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800;
+    }
+    .point-a { left: 0; }
+    .point-b { right: 0; border-color: #d63031; color: #d63031; }
+
+    /* Robot (e-puck style) */
+    .robot-visual {
+      position: absolute; top: -18px; left: 0;
+      width: 40px; height: 40px; background: #0984e3;
+      border: 4px solid #fff; border-radius: 50%;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      transition: left 2s ease-in-out; /* Default sekin borish */
+      z-index: 10; display: flex; align-items: center; justify-content: center;
+    }
+    .robot-visual::after {
+      content: ''; width: 10px; height: 6px; background: #fff; border-radius: 2px; position: absolute; right: 2px;
+    }
+    .robot-visual.returning { transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1); } /* Tez qaytish */
+
+    /* Dashboard elementlari (oldingi koddan) */
+    .status-bar {
+      display:flex; align-items:center; gap:0.75rem;
+      background:#fff; border:1px solid #e0e0e0; border-radius:12px;
+      padding:1rem; margin-bottom:1.5rem; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+    .dot { width:12px; height:12px; border-radius:50%; background:#ccc; }
+    .dot.online { background:#22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, 0.4); }
+    .status-state { font-weight:700; color: #2d3436; }
+    .status-dest { color:#636e72; font-style: italic; }
+
+    .zones { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1.5rem; }
+    .zone-btn {
+      background:#fff; border:1px solid #e0e0e0; border-radius:14px;
+      padding:1.25rem; text-align:center; cursor:pointer; transition:all 0.2s;
+    }
+    .zone-btn:hover { transform: translateY(-3px); border-color: #0984e3; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    .zone-letter { font-size:1.8rem; font-weight:800; }
+    .zb .zone-letter { color:#d63031; } .zc .zone-letter { color:#0984e3; } .zd .zone-letter { color:#00b894; }
+    .zone-count { font-size:0.75rem; color:#b2bec3; margin-top:0.5rem; display:block; }
+    .zone-count.has { color:#00b894; font-weight:700; }
+
+    .queue-list { display:flex; flex-direction:column; gap:0.5rem; }
+    .q-item {
+      display:flex; align-items:center; gap:1rem; background:#fff;
+      border:1px solid #e0e0e0; border-radius:10px; padding:0.8rem;
+    }
+    .log-box { margin-top:1.5rem; background:#fff; border:1px solid #e0e0e0; border-radius:12px; overflow:hidden; }
+    .log-title { padding:0.8rem; background:#f8f9fa; font-size:0.75rem; font-weight:700; color:#636e72; border-bottom:1px solid #eee; }
+    .log-rows { max-height:150px; overflow-y:auto; font-size:0.8rem; padding:0.5rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Avtonom yetkazib beruvchi robot prototipi</h1>
+  <p class="sub">Aqlli logistika boshqaruvi</p>
+
+  <div class="status-bar">
+    <div class="dot" id="s-dot"></div>
+    <div class="status-text">
+      <span class="status-state" id="s-state">Yuklanmoqda...</span>
+      <span class="status-dest" id="s-dest"></span>
+    </div>
+    <div style="margin-left:auto; font-size:0.85rem">
+      Bajarildi: <strong id="s-done">0</strong>
+    </div>
+  </div>
+
+    <div class="map-section">
+    <button class="toggle-btn" onclick="toggleMap()">
+      <span id="toggle-icon">▼</span> Xaritani ko'rsatish/yashirish
+    </button>
+    <div id="map-container" class="map-content">
+      <img src="../static/images/image.png" alt="Xarita">
+    </div>
+  </div>
+
+    <div class="zones">
+    <div class="zone-btn zb" onclick="addOrder('B')">
+      <div class="zone-letter">B</div>
+      <div class="zone-count" id="cnt-B">0 ta</div>
+    </div>
+    <div class="zone-btn zc" onclick="addOrder('C')">
+      <div class="zone-letter">C</div>
+      <div class="zone-count" id="cnt-C">0 ta</div>
+    </div>
+    <div class="zone-btn zd" onclick="addOrder('D')">
+      <div class="zone-letter">D</div>
+      <div class="zone-count" id="cnt-D">0 ta</div>
+    </div>
+  </div>
+
+  <div class="sim-area">
+    <div class="track">
+      <div class="point point-a">A</div>
+      <div class="point point-b" id="dest-label">?</div>
+      <div id="robot-sim" class="robot-visual">🤖</div>
+    </div>
+  </div>
+
+
+  <div class="queue-list" id="q-list"></div>
+
+  <div class="log-box">
+    <div class="log-title">TIZIM JURNALI</div>
+    <div class="log-rows" id="log-rows"></div>
+  </div>
+</div>
+
+<script>
+const STATES = {
+  IDLE:'Kutmoqda', idle:'Kutmoqda',
+  going_to_dest:'Ketmoqda...', waiting:'Yuk tushirilmoqda',
+  going_to_A:'Qaytmoqda ⚡', waiting_at_A:'Bazada'
+};
+
+function toggleMap() {
+  const map = document.getElementById('map-container');
+  const icon = document.getElementById('toggle-icon');
+  map.classList.toggle('hidden');
+  icon.textContent = map.classList.contains('hidden') ? '▶' : '▼';
+}
+
+async function refresh() {
+  try {
+    const data = await fetch('/api/status').then(r => r.json());
+    
+    // Status update
+    document.getElementById('s-dot').className = 'dot ' + (data.online ? 'online' : 'offline');
+    document.getElementById('s-state').textContent = STATES[data.state] || data.state;
+    document.getElementById('s-dest').textContent = data.current ? '→ ' + data.current : '';
+    document.getElementById('s-done').textContent = data.completed;
+
+    // Robot Animatsiyasi Logikasi
+    const robot = document.getElementById('robot-sim');
+    const destLabel = document.getElementById('dest-label');
+    
+    if (data.current) destLabel.textContent = data.current;
+
+    if (data.state === 'going_to_dest' || data.state === 'waiting') {
+      // Manzilga borish
+      robot.classList.remove('returning');
+      robot.style.left = "calc(100% - 40px)";
+    } else if (data.state === 'going_to_A' || data.state === 'waiting_at_A' || data.state === 'idle') {
+      // A nuqtaga qaytish (TEZ)
+      robot.classList.add('returning');
+      robot.style.left = "0px";
+      if (data.state === 'idle') destLabel.textContent = "?";
+    }
+
+    // Navbat va boshqa UI elementlar (Optimallashtirilgan)
+    ['B','C','D'].forEach(k => {
+      document.getElementById('cnt-' + k).textContent = (data.counts[k] || 0) + ' ta';
+    });
+
+    const list = document.getElementById('q-list');
+    list.innerHTML = data.orders.map((o, i) => `
+      <div class="q-item">
+        <strong style="color:#0984e3">#${i+1}</strong>
+        <span>Zona ${o}</span>
+        <button onclick="deleteOrder(${i})" style="margin-left:auto; border:none; background:none; cursor:pointer">✕</button>
+      </div>`).join('') || '<div style="text-align:center; color:#ccc; padding:1rem">Navbat bo\'sh</div>';
+
+    document.getElementById('log-rows').innerHTML = data.log.map(e => 
+      `<div style="margin-bottom:4px"><small style="color:#b2bec3">${e.time}</small> ${e.msg}</div>`
+    ).join('');
+
+  } catch(e) { console.error("Xatolik:", e); }
+}
+
+async function addOrder(dest) {
+  await fetch('/api/add', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({dest})
+  });
+  refresh();
+}
+
+async function deleteOrder(idx) {
+  await fetch('/api/delete', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({index: idx})
+  });
+  refresh();
+}
+
+setInterval(refresh, 1000);
+refresh();
+</script>
+</body>
+</html>
